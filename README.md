@@ -48,6 +48,7 @@ Atbcn ha sido implementado como una Progressive Web App (PWA) utilizando Serwist
 La implementación PWA mejora significativamente la experiencia del usuario al proporcionar una aplicación que se siente nativa pero mantiene la accesibilidad de una web.
 
 ## atbcn 2.1 Mejora integral (Febrero 2024)
+
 Tras unos meses funcionando una primera versión de la app, y siendo de gran utilidad para gran cantidad de usuarios, se procede a realizar una mejora integral que ha consistido en:
 
 - **Cambio de idioma:** Adaptación al idioma local (catalán).
@@ -80,6 +81,10 @@ Después de completar estos pasos, el usuario tiene la opción de previsualizar 
 
 Este nuevo enfoque no solo mejora la usabilidad, sino que también optimiza la introducción de datos y la verificación, haciendo el proceso más eficiente
 
+## atbcn 2.3 Implementación de PWA (Agosto 2025)
+
+Se implementa Progressive Web App (PWA) para mejorar la experiencia del usuario y permitir la instalación de la aplicación en dispositivos móviles.
+
 ## Créditos
 
 Este proyecto está desarrollado y mantenido por [Pablo](https://www.pablodelbarrio.es/).
@@ -108,9 +113,8 @@ Este proyecto se encuentra bajo la licencia [MIT](LICENSE).
 - [x] Added zoomin onclick in the poster of each Modal info
 - [x] Implement PWA functionality
 - [x] Implement Add to Google Calendar
-- [ ] Improve PWA functionality as it is not very stable
-- [x] Add a multistep form to improve UX when filling info of events
-- [ ] Add a dropdown with the locations that is also a link to the location on google maps
+- [x] Add a multistep form to improve UX when filling info of events (2.2)
+- [x] Added PWA functionality (2.3)
 
 ### Figma prototype
 
