@@ -7,6 +7,14 @@
   "display": "standalone",
   "orientation": "portrait",
   "description": "agenda online",
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
   "icons": [
     {
       "src": "/icons/android-chrome-192x192.png",

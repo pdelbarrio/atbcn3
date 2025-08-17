@@ -8,6 +8,9 @@ import { GlobalContextProvider } from "@/context/events.context";
 import { AuthContextProvider } from "@/context/auth.context";
 import { Toaster } from "@/components/ui/toaster";
 import { Footer } from "@/components/Footer";
+import dynamic from "next/dynamic";
+
+const PWA = dynamic(() => import("./pwa"), { ssr: false });
 
 const nunito = Nunito({
   weight: ["200", "400", "600", "700", "800"],
@@ -85,6 +88,7 @@ export default function RootLayout({
           </AuthContextProvider>
         </ThemeProvider>
         <Toaster />
+        <PWA />
       </body>
     </html>
   );

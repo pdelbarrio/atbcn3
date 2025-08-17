@@ -89,7 +89,7 @@ export default function AddEvent() {
       if (session.data.session?.user.email) {
         setCreatedBy(session.data.session?.user.email);
       } else {
-        setCreatedBy("unkown user");
+        setCreatedBy("unknown user");
       }
     }
     fetchSession();

@@ -35,8 +35,19 @@ Con @bcn, he creado una herramienta práctica y eficiente para mantener a las pe
 
 Este proyecto también destaca mi habilidad para crear una interfaz de usuario intuitiva y receptiva, así como nuestro enfoque en la calidad y la seguridad de los datos. @bcn es más que una simple agenda de eventos; es un testimonio de mi experiencia en desarrollo web y mi capacidad para entregar proyectos funcionales y orientados al usuario.
 
-## atbcn 2.1 Mejora integral (Febrero 2024)
+## PWA Functionality
 
+Atbcn ha sido implementado como una Progressive Web App (PWA) utilizando Serwist, lo que permite a los usuarios:
+
+- **Instalación en dispositivos:** Instalar la aplicación directamente en sus dispositivos móviles o de escritorio sin necesidad de pasar por tiendas de aplicaciones.
+- **Experiencia offline:** Acceder a la información básica y eventos guardados incluso sin conexión a internet.
+- **Actualizaciones automáticas:** Recibir actualizaciones de la aplicación de forma transparente sin intervención del usuario.
+- **Notificaciones push:** Recibir alertas sobre nuevos eventos o actualizaciones importantes (funcionalidad en desarrollo).
+- **Rendimiento mejorado:** Experimentar tiempos de carga más rápidos gracias al almacenamiento en caché de recursos.
+
+La implementación PWA mejora significativamente la experiencia del usuario al proporcionar una aplicación que se siente nativa pero mantiene la accesibilidad de una web.
+
+## atbcn 2.1 Mejora integral (Febrero 2024)
 Tras unos meses funcionando una primera versión de la app, y siendo de gran utilidad para gran cantidad de usuarios, se procede a realizar una mejora integral que ha consistido en:
 
 - **Cambio de idioma:** Adaptación al idioma local (catalán).
@@ -48,6 +59,7 @@ Tras unos meses funcionando una primera versión de la app, y siendo de gran uti
 - **Cumplimiento de estándares de Google:** Añadir condiciones de servicio y política de privacidad para cumplir los estándares requeridos por Google para poder usar el Google OAuth (Login social).
 - **Pruebas de unidad:** Añadir pruebas unitarias con Jest.
 - **Pruebas de integración:** Añadir pruebas de integración con Jest.
+- **Implementación PWA:** Integración de Progressive Web App (PWA) con Serwist para permitir la instalación como aplicación y funcionamiento offline.
 - **Pruebas end-to-end:** Añadir pruebas e2e con Cypress.
 
 Una vez realizada esta mejora integral, se continúan realizando mejoras como la mejora de la UX/UI de la visualización de los eventos, etc.
