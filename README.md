@@ -85,6 +85,10 @@ Este nuevo enfoque no solo mejora la usabilidad, sino que también optimiza la i
 
 Se implementa Progressive Web App (PWA) para mejorar la experiencia del usuario y permitir la instalación de la aplicación en dispositivos móviles.
 
+## atbcn 2.4 Actualización de dependencias (Diciembre 2025)
+
+Se realiza actualización de dependencias de prioridad baja y media.
+
 ## Créditos
 
 Este proyecto está desarrollado y mantenido por [Pablo](https://www.pablodelbarrio.es/).
