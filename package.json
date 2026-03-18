@@ -1,6 +1,6 @@
 {
   "name": "atbcn2",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -28,6 +28,7 @@
     "@supabase/supabase-js": "^2.86.2",
     "@types/jest": "^29.5.14",
     "add-to-calendar-button-react": "^2.13.3",
+    "cheerio": "^1.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cookies-next": "^2.1.1",

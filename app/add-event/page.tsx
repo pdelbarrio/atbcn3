@@ -15,6 +15,7 @@ import Image from "next/image";
 import { toast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 
 /**
  * AddEvent component - Multi-step form for creating new events
@@ -33,6 +34,8 @@ export default function AddEvent() {
   const [descriptionLength, setDescriptionLength] = useState<number>(0);
   const [inputTag, setInputTag] = useState<string>("");
   const [location, setLocation] = useState<string>("");
+  const [address, setAddress] = useState<string | null>(null);
+  const [mapLink, setMapLink] = useState<string | null>(null);
   const [price, setPrice] = useState<string>("");
   const [link, setLink] = useState<string>("");
   const [date, setDate] = useState<Date | null>(new Date());
@@ -159,6 +162,8 @@ export default function AddEvent() {
         description: description,
         tags: tags,
         location: location,
+        address: address,
+        map_link: mapLink,
         price: price,
         date: formattedDate,
         link: link,
@@ -233,7 +238,7 @@ export default function AddEvent() {
   const stepFieldsMap = {
     step1: ["name", "description"],
     step2: ["tags"],
-    step3: ["location", "price", "link"],
+    step3: ["location", "address", "map_link", "price", "link"],
   };
 
   /**
@@ -256,6 +261,8 @@ export default function AddEvent() {
           description,
           tags,
           location,
+          address,
+          map_link: mapLink,
           price,
           link,
           date,
@@ -319,6 +326,8 @@ export default function AddEvent() {
           description,
           tags,
           location,
+          address,
+          map_link: mapLink,
           price,
           date: formattedDate,
           link,
@@ -561,14 +570,14 @@ export default function AddEvent() {
 
             <TabsContent value="step3" className="space-y-4">
               <div className="mb-4">
-                <Input
-                  data-testid="event-location"
-                  type="text"
-                  placeholder="ubicació"
-                  id="location"
-                  className="w-full border border-primary dark:border-glow p-2 rounded-md"
+                <LocationAutocomplete
                   value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+                  onChange={(name, addr, link) => {
+                    setLocation(name);
+                    setAddress(addr);
+                    setMapLink(link);
+                  }}
+                  error={(errors as EventFormErrors).location as string}
                 />
                 {(errors as EventFormErrors).location && (
                   <span className="text-red-500 font-bold italic text-xs">

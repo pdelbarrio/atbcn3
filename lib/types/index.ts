@@ -6,6 +6,8 @@ export interface EventType {
   description: string | null;
   date: string;
   location: string;
+  address: string | null;
+  map_link: string | null;
   price: string;
   link: string | null;
   poster: string | null;
@@ -20,6 +22,8 @@ export interface PreviewEventType {
   name: string;
   description: string | null;
   location: string;
+  address: string | null;
+  map_link: string | null;
   price: string;
   link: string | null;
   poster: string | null;
@@ -28,6 +32,14 @@ export interface PreviewEventType {
   created_by: string | null | undefined;
   // completed: boolean;
   // created_at: string;
+}
+
+export interface LocationType {
+  id: number;
+  name: string;
+  address: string;
+  map_link: string;
+  created_at: string;
 }
 
 export interface EventContextType {
@@ -51,6 +63,8 @@ export interface EventFormType {
   description: string;
   tags: string[];
   location: string;
+  address: string | null;
+  map_link: string | null;
   price: string;
   link: string;
 }

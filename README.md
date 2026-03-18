@@ -89,6 +89,10 @@ Se implementa Progressive Web App (PWA) para mejorar la experiencia del usuario 
 
 Se realiza actualización de dependencias de prioridad baja y media.
 
+## atbcn 2.5 Mejora de ubicaciones y autocompletado (Marzo 2026)
+
+Se añade tabla `locations` para estructurar las salas y se implementa autocompletado en la introducción de las salas, incluyendo enlaces a mapa para cada ubicación, mejorando la UX.
+
 ## Créditos
 
 Este proyecto está desarrollado y mantenido por [Pablo](https://www.pablodelbarrio.es/).
@@ -119,6 +123,8 @@ Este proyecto se encuentra bajo la licencia [MIT](LICENSE).
 - [x] Implement Add to Google Calendar
 - [x] Add a multistep form to improve UX when filling info of events (2.2)
 - [x] Added PWA functionality (2.3)
+- [x] Updated dependencies (2.4)
+- [x] Improved event creation with location autocomplete and map links (2.5)
 
 ### Figma prototype
 

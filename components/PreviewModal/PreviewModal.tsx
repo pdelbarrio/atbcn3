@@ -62,6 +62,8 @@ const PreviewModal = () => {
           date: previewEvent?.date,
           tags: previewEvent?.tags,
           location: previewEvent?.location,
+          address: previewEvent?.address,
+          map_link: previewEvent?.map_link,
           price: previewEvent?.price,
           description: previewEvent?.description,
           poster: uploadedPoster,

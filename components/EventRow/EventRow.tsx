@@ -35,7 +35,7 @@ const EventRow = ({ event }: Props) => {
   const endTime = format(addHours(eventDate, 2), "HH:mm");
   const formattedDateStr = formattedDate(
     event.date,
-    "eee, dd/MM/yyyy HH:mm'h'"
+    "eee, dd/MM/yyyy HH:mm'h'",
   );
 
   const handleClick = () => {
@@ -167,12 +167,30 @@ const EventRow = ({ event }: Props) => {
               <div className="mt-6">
                 <div
                   data-testid="event-location"
-                  className="flex items-center bg-slate-200 dark:bg-glow rounded p-1"
+                  className="flex flex-col bg-slate-200 dark:bg-glow rounded p-1"
                 >
-                  <MdLocationOn className="text-black" />
-                  <p className="ml-2 text-black text-sm  dark:text-black">
-                    {event.location}
-                  </p>
+                  <div className="flex items-center">
+                    <MdLocationOn className="text-black" />
+                    {event.map_link ? (
+                      <a
+                        href={event.map_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 text-black text-sm dark:text-black font-bold hover:underline"
+                      >
+                        {event.location}
+                      </a>
+                    ) : (
+                      <p className="ml-2 text-black text-sm dark:text-black font-bold">
+                        {event.location}
+                      </p>
+                    )}
+                  </div>
+                  {event.address && (
+                    <p className="ml-6 text-black text-xs dark:text-black italic">
+                      {event.address}
+                    </p>
+                  )}
                 </div>
                 <div
                   data-testid="event-date"
@@ -214,7 +232,11 @@ const EventRow = ({ event }: Props) => {
           <AddToCalendarButton
             name={event.name}
             options={["Google"]}
-            location={event.location}
+            location={
+              event.address
+                ? `${event.location}, ${event.address}`
+                : event.location
+            }
             startDate={startDate}
             endDate={startDate}
             startTime={startTime}

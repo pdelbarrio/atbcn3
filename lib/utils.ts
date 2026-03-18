@@ -29,7 +29,9 @@ export const eventSchema = Yup.object()
       .of(Yup.string().max(15, "Cada tag no pot tenir més de 15 caràcters")),
     location: Yup.string()
       .required("La ubicació és obligatòria")
-      .max(40, "La ubicació no pot tenir més de 40 caràcters"),
+      .max(100, "La ubicació no pot tenir més de 100 caràcters"),
+    address: Yup.string().nullable().max(255, "L'adreça no pot tenir més de 255 caràcters"),
+    map_link: Yup.string().nullable(),
     price: Yup.string()
       .required("El preu és obligatori")
       .max(30, "El preu no pot tenir més de 30 caràcters"),
