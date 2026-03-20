@@ -9,6 +9,7 @@ import { AuthContextProvider } from "@/context/auth.context";
 import { Toaster } from "@/components/ui/toaster";
 import { Footer } from "@/components/Footer";
 import dynamic from "next/dynamic";
+import { Analytics } from "@vercel/analytics/react";
 
 const PWA = dynamic(() => import("./pwa"), { ssr: false });
 
@@ -90,6 +91,7 @@ export default function RootLayout({
         </ThemeProvider>
         <Toaster />
         <PWA />
+        <Analytics />
       </body>
     </html>
   );
