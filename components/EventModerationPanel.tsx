@@ -36,6 +36,10 @@ export default function EventModerationPanel() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editData, setEditData] = useState<Partial<Evento>>({});
 
+  const [cleanupToken, setCleanupToken] = useState("");
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [cleanupMessage, setCleanupMessage] = useState<string | null>(null);
+
   const scrapearSala = async () => {
     setLoading(true);
     setEventos([]);
@@ -161,6 +165,50 @@ export default function EventModerationPanel() {
     }
   };
 
+  const handleCleanupPastEvents = async () => {
+    if (!cleanupToken.trim()) {
+      alert(
+        "Introduce el token de administrador antes de ejecutar la limpieza.",
+      );
+      return;
+    }
+
+    if (
+      !confirm(
+        "CONFIRMACIÓN: quieres eliminar todos los eventos pasados (fecha anterior al inicio de hoy) de la base de datos? Esta acción no se puede deshacer.",
+      )
+    ) {
+      return;
+    }
+
+    setCleanupLoading(true);
+    setCleanupMessage(null);
+
+    try {
+      const response = await fetch("/api/admin/cleanup-events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-cleanup-token": cleanupToken.trim(),
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Error en limpieza");
+      }
+
+      setCleanupMessage(
+        `Limpieza completada: ${result.deleted ?? 0} eventos pasados eliminados`,
+      );
+    } catch (error) {
+      setCleanupMessage("Error limpieza: " + (error as Error).message);
+    } finally {
+      setCleanupLoading(false);
+    }
+  };
+
   const descartarEvento = (id: number) => {
     setEventos((prev) => prev.filter((e) => e.id !== id));
   };
@@ -243,6 +291,37 @@ export default function EventModerationPanel() {
                 <Download size={20} />
                 Exportar JSON
               </button>
+            )}
+          </div>
+
+          <div className="bg-red-800/40 border border-red-600 rounded-lg p-4 mt-4">
+            <h2 className="text-lg font-semibold text-red-200 mb-2">
+              🚨 Limpieza de eventos pasados (solo admin)
+            </h2>
+            <p className="text-sm text-red-100 mb-3">
+              El endpoint elimina eventos con fecha anterior al inicio de hoy.
+              Usa el token secreto de ADMIN_CLEANUP_TOKEN.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+              <div className="md:col-span-2">
+                <input
+                  type="password"
+                  value={cleanupToken}
+                  onChange={(e) => setCleanupToken(e.target.value)}
+                  placeholder="Token administrador"
+                  className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-red-400"
+                />
+              </div>
+              <button
+                onClick={handleCleanupPastEvents}
+                disabled={cleanupLoading}
+                className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg transition-all"
+              >
+                {cleanupLoading ? "Limpiando..." : "Eliminar pasado"}
+              </button>
+            </div>
+            {cleanupMessage && (
+              <p className="text-sm text-white mt-2">{cleanupMessage}</p>
             )}
           </div>
         </div>
