@@ -37,15 +37,18 @@ export async function POST(request: Request) {
 
   const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-  const { data, error } = await supabase
-    .from("events")
-    .delete()
-    .lt("date", cutoff.toISOString());
+ const { error, count } = await supabase
+  .from("events")
+  .delete({ count: "exact" })
+  .lt("date", cutoff.toISOString());
 
   if (error) {
     console.error("Error al eliminar eventos pasados:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ message: "Eventos pasados eliminados", deleted: data?.length ?? 0 });
+  return NextResponse.json({
+  message: "Eventos pasados eliminados",
+  deleted: count ?? 0
+});
 }
