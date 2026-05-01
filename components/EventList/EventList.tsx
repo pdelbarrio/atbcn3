@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { startOfWeek, endOfWeek, addWeeks, subWeeks } from "date-fns";
+import React, { useState, useEffect } from "react";
+import { startOfWeek, endOfWeek, addWeeks, subWeeks, format } from "date-fns";
 import { formattedDate } from "@/lib/utils";
 import { LeftArrow, RightArrow } from "../Buttons";
 import {
@@ -25,6 +25,24 @@ export default function EventList({ events }: any) {
     return eventDate >= currentWeekStart && eventDate <= currentWeekEnd;
   });
 
+  const eventsThisWeekSorted = [...eventsThisWeek].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+  );
+
+  const groupedEvents = eventsThisWeekSorted.reduce(
+    (groups: Record<string, EventType[]>, event) => {
+      const dayKey = format(new Date(event.date), "yyyy-MM-dd");
+      if (!groups[dayKey]) {
+        groups[dayKey] = [];
+      }
+      groups[dayKey].push(event);
+      return groups;
+    },
+    {},
+  );
+
+  const groupedEventEntries = Object.entries(groupedEvents);
+
   const isFirstWeek =
     currentWeekStart.getTime() ===
     startOfWeek(new Date(), { weekStartsOn: 1 }).getTime();
@@ -36,6 +54,12 @@ export default function EventList({ events }: any) {
   const previousWeek = () => {
     setCurrentWeek(subWeeks(currentWeek, 1));
   };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [currentWeek]);
 
   return (
     <>
@@ -63,8 +87,23 @@ export default function EventList({ events }: any) {
       <div>
         {eventsThisWeek.length > 0 ? (
           <div suppressHydrationWarning>
-            {eventsThisWeek.map((event: EventType) => (
-              <EventRow data-testid="event-row" event={event} key={event.id} />
+            {groupedEventEntries.map(([dayKey, groupEvents]) => (
+              <div key={dayKey} className="mb-4">
+                <div className="mb-2">
+                  <div className="text-left text-sm md:text-base font-bold text-text dark:text-glow uppercase tracking-wide">
+                    {formattedDate(`${dayKey}T00:00:00.000Z`, "eeee d")}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {groupEvents.map((event: EventType) => (
+                    <EventRow
+                      data-testid="event-row"
+                      event={event}
+                      key={event.id}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         ) : (

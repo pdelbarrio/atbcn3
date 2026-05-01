@@ -29,6 +29,8 @@ describe("unit tests of the EventRow component", () => {
       price: "Free",
       tags: ["Test tag 1", "Test tag 2"],
       description: "Event description",
+      address: null,
+      map_link: null,
       link: "http://fakelinkofevent.com",
       poster: "http://fakelinkoftheposter.jpg",
       validated: true,
@@ -39,7 +41,7 @@ describe("unit tests of the EventRow component", () => {
     // Calculate the formatted date string.
     const formattedDateStr = formattedDate(
       event.date,
-      "eee, dd/MM/yyyy HH:mm'h'"
+      "eee, dd/MM/yyyy HH:mm'h'",
     );
     //Act: Render the component with the event
     render(<EventRow event={event} />);
@@ -63,6 +65,8 @@ describe("unit tests of the EventRow component", () => {
       price: "Free",
       tags: ["Test tag 1", "Test tag 2"],
       description: "Event description",
+      address: null,
+      map_link: null,
       link: "http://fakelinkofevent.com",
       poster: "http://fakelinkoftheposter.jpg",
       validated: true,
@@ -74,7 +78,7 @@ describe("unit tests of the EventRow component", () => {
     // Calculate the formatted date string.
     const formattedDateStr = formattedDate(
       event.date,
-      "eee, dd/MM/yyyy HH:mm'h'"
+      "eee, dd/MM/yyyy HH:mm'h'",
     );
 
     //Act: Render the component with the event

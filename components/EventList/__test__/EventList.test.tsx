@@ -1,6 +1,7 @@
 import { advanceTo, clear } from "jest-date-mock";
 import { render, screen, fireEvent } from "@testing-library/react";
 import EventList from "../EventList";
+import { formattedDate } from "@/lib/utils";
 
 describe("unit tests of the EventList component", () => {
   beforeEach(() => {
@@ -25,6 +26,24 @@ describe("unit tests of the EventList component", () => {
     render(<EventList events={events} />);
 
     // Assert: Check that only the events for the current week are rendered.
+    const eventRows = screen.getAllByTestId("event-row");
+    expect(eventRows).toHaveLength(3);
+  });
+
+  test("renders date separators for grouped events", () => {
+    const events = [
+      { id: "1", date: "2024-02-01T10:00:00.000Z" },
+      { id: "2", date: "2024-02-01T15:00:00.000Z" },
+      { id: "3", date: "2024-02-02T10:00:00.000Z" },
+    ];
+
+    render(<EventList events={events} />);
+
+    const firstDateLabel = formattedDate("2024-02-01T00:00:00.000Z", "eeee d");
+    const secondDateLabel = formattedDate("2024-02-02T00:00:00.000Z", "eeee d");
+
+    expect(screen.getByText(firstDateLabel)).toBeInTheDocument();
+    expect(screen.getByText(secondDateLabel)).toBeInTheDocument();
     const eventRows = screen.getAllByTestId("event-row");
     expect(eventRows).toHaveLength(3);
   });
@@ -83,7 +102,7 @@ describe("unit tests of the EventList component", () => {
 
     // Assert: Check that the correct message is rendered.
     const message = screen.getByText(
-      "No hi ha esdeveniments introduïts per a aquesta setmana"
+      "No hi ha esdeveniments introduïts per a aquesta setmana",
     );
     expect(message).toBeInTheDocument();
   });

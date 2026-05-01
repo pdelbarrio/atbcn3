@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
+// @ts-ignore: side-effect import of CSS requires declaration file
 import "./globals.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { ThemeProvider } from "@/components/theme-provider";

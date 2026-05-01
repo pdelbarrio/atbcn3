@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "types": ["@serwist/next/typings"],
+    "target": "es2015",
+    "types": ["@types/jest"],
     "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -20,7 +20,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*", "./src/*"]
     }
   },
   "include": [
@@ -31,5 +31,5 @@
     "lib/CloudinaryUploadWidget.js",
     "types/**/*.d.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/__tests__/**/*", "**/__test__/**/*"]
 }

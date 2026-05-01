@@ -93,6 +93,10 @@ Se realiza actualización de dependencias de prioridad baja y media.
 
 Se añade tabla `locations` para estructurar las salas y se implementa autocompletado en la introducción de las salas, incluyendo enlaces a mapa para cada ubicación, mejorando la UX.
 
+## atbcn 2.6 Mejora de UX de navegación entre eventos (Mayo 2026)
+
+Mejora de la experiencia de navegación de eventos semanal: los eventos ahora se agrupan por día y muestran claramente la hora en cada entrada, sin repetir la fecha en cada fila. Además, al cambiar de semana con los controles, la vista se desplaza automáticamente hacia arriba para que el usuario vea desde el inicio de la nueva semana y no quede atrapado al final de la lista.
+
 ## Créditos
 
 Este proyecto está desarrollado y mantenido por [Pablo](https://www.pablodelbarrio.es/).
@@ -125,6 +129,7 @@ Este proyecto se encuentra bajo la licencia [MIT](LICENSE).
 - [x] Added PWA functionality (2.3)
 - [x] Updated dependencies (2.4)
 - [x] Improved event creation with location autocomplete and map links (2.5)
+- [x] Improved UX for navigating events. Events now are grouped by day and when the week changes, the page automatically scrolls to the top.(2.6)
 
 ### Figma prototype
 

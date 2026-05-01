@@ -19,7 +19,7 @@ const config: Config = {
   preset: "ts-jest",
   // Add more setup options before each test is run
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/lib/actions/events',
+    '^@/(.*)$': '<rootDir>/$1',
   },
 };
 
