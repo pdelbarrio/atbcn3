@@ -8,6 +8,7 @@ import {
   IoIosArrowDropleftCircle,
   IoIosArrowDroprightCircle,
 } from "react-icons/io";
+import { TbSlashes } from "react-icons/tb";
 import { EventType } from "@/lib/types";
 import EventRow from "../EventRow/EventRow";
 
@@ -90,7 +91,8 @@ export default function EventList({ events }: any) {
             {groupedEventEntries.map(([dayKey, groupEvents]) => (
               <div key={dayKey} className="mb-4">
                 <div className="mb-2">
-                  <div className="text-left text-sm md:text-base font-bold text-text dark:text-glow uppercase tracking-wide">
+                  <div className="flex items-center text-left text-sm md:text-base font-bold text-text dark:text-glow uppercase tracking-wide">
+                    <TbSlashes />
                     {formattedDate(`${dayKey}T00:00:00.000Z`, "eeee d")}
                   </div>
                 </div>
