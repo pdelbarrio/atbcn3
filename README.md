@@ -12,6 +12,8 @@ La aplicación para estar al día de los eventos locales.
 
 - **Explora eventos:** Accede a una lista organizada de eventos de la ciudad en la semana actual y posteriores y desplázate fácilmente para descubrir lo que está sucediendo en tu área.
 
+- **Filtros globales:** Filtra toda la agenda por día, sala y estilos desde un panel flotante; al quitar los filtros se recupera la navegación semanal.
+
 - **Interfaz intuitiva:** Navega por la aplicación de manera sencilla e intuitiva. Los eventos se presentan de forma apilada, lo que te permite desplazarte y explorar rápidamente la información relevante.
 
 - **Detalles esenciales:** Cada evento muestra información clave, como el nombre, la fecha y hora, la ubicación, el precio y etiquetas descriptivas que brindan una idea general del evento.
@@ -97,6 +99,16 @@ Se añade tabla `locations` para estructurar las salas y se implementa autocompl
 
 Mejora de la experiencia de navegación de eventos semanal: los eventos ahora se agrupan por día y muestran claramente la hora en cada entrada, sin repetir la fecha en cada fila. Además, al cambiar de semana con los controles, la vista se desplaza automáticamente hacia arriba para que el usuario vea desde el inicio de la nueva semana y no quede atrapado al final de la lista.
 
+## atbcn 2.7 Filtros globales y estabilidad PWA (Noviembre 2026)
+
+Se añade un panel de filtros accesible desde un botón que permite filtrar **toda la agenda** por día, sala y estilos. Al aplicarlos, la navegación semanal se sustituye por una lista agrupada por día con la fecha completa y un contador de resultados; al pulsar `Neteja` o `Treu filtres` se limpian y se recupera la vista semanal habitual.
+
+También se corrige el registro del service worker en desarrollo para evitar que una caché obsoleta sirva chunks antiguos y provoque el error `ChunkLoadError: Loading chunk app/layout failed.` en Chrome. Los recursos estáticos pasan a una estrategia stale-while-revalidate con expiración.
+
+## Deuda técnica / migraciones
+
+- [Auditoría de migración a Next.js 16 y plan de contingencia](docs/next16-upgrade-audit.md). Decisión actual: mantener Serwist con webpack (`next build --webpack`) cuando se aborde la migración.
+
 ## Créditos
 
 Este proyecto está desarrollado y mantenido por [Pablo](https://www.pablodelbarrio.es/).
@@ -130,6 +142,8 @@ Este proyecto se encuentra bajo la licencia [MIT](LICENSE).
 - [x] Updated dependencies (2.4)
 - [x] Improved event creation with location autocomplete and map links (2.5)
 - [x] Improved UX for navigating events. Events now are grouped by day and when the week changes, the page automatically scrolls to the top.(2.6)
+- [x] Added global filters by day, venue and tags (2.7)
+- [x] Fixed stale service worker chunks in development (2.7)
 
 ### Figma prototype
 
