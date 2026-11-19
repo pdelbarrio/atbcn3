@@ -2,6 +2,32 @@ import { advanceTo, clear } from "jest-date-mock";
 import { render, screen, fireEvent } from "@testing-library/react";
 import EventList from "../EventList";
 import { formattedDate } from "@/lib/utils";
+import { EventType } from "@/lib/types";
+
+const makeEvent = (
+  id: string,
+  date: string,
+  location: string,
+  tags: string[] = [],
+): EventType => ({
+  id,
+  name: `Event ${id}`,
+  date,
+  location,
+  tags,
+  price: "Free",
+  description: null,
+  address: null,
+  map_link: null,
+  link: null,
+  poster: null,
+  validated: true,
+  completed: true,
+  created_at: "2024-01-01T00:00:00.000Z",
+  created_by: "test",
+});
+
+const openFilters = () => fireEvent.click(screen.getByTestId("filters-toggle"));
 
 describe("unit tests of the EventList component", () => {
   beforeEach(() => {
@@ -74,7 +100,7 @@ describe("unit tests of the EventList component", () => {
     const previousWeekButton = screen.getByTestId("previous-week-button");
     fireEvent.click(previousWeekButton);
 
-    // Assert: Check that only the events for the first week are now rendered again.
+    // Assert: Check that only the events for the first week are rendered again.
     eventRows = screen.getAllByTestId("event-row");
     expect(eventRows).toHaveLength(1); // Adjust this number based on the number of events for the first week.
   });
@@ -105,5 +131,116 @@ describe("unit tests of the EventList component", () => {
       "No hi ha esdeveniments introduïts per a aquesta setmana",
     );
     expect(message).toBeInTheDocument();
+  });
+
+  test("keeps filters collapsed until the button is clicked", () => {
+    render(<EventList events={[]} />);
+
+    expect(screen.queryByTestId("filters-panel")).not.toBeInTheDocument();
+
+    openFilters();
+
+    expect(screen.getByTestId("filters-panel")).toBeInTheDocument();
+  });
+
+  test("filters by venue with partial and accent-insensitive matching", () => {
+    const events = [
+      makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol"),
+      makeEvent("2", "2024-02-01T21:00:00.000Z", "La Deskomunal"),
+    ];
+
+    render(<EventList events={events} />);
+    openFilters();
+    fireEvent.change(screen.getByTestId("filter-location"), {
+      target: { value: "vol" },
+    });
+
+    expect(screen.getAllByTestId("event-row")).toHaveLength(1);
+    expect(screen.getByText("Event 1")).toBeInTheDocument();
+  });
+
+  test("filters by tag with several tags selected and unifies case variants", () => {
+    const events = [
+      makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol", ["indie"]),
+      makeEvent("2", "2024-02-01T21:00:00.000Z", "La Deskomunal", ["INDIE"]),
+      makeEvent("3", "2024-02-01T22:00:00.000Z", "Sala Vol", ["jazz"]),
+    ];
+
+    render(<EventList events={events} />);
+    openFilters();
+    fireEvent.click(screen.getByTestId("filter-tag-indie"));
+
+    expect(screen.getAllByTestId("event-row")).toHaveLength(2);
+
+    fireEvent.click(screen.getByTestId("filter-tag-jazz"));
+
+    expect(screen.getAllByTestId("event-row")).toHaveLength(3);
+  });
+
+  test("jumps to a single day and returns to the week view", () => {
+    const events = [
+      makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol", ["indie"]),
+      makeEvent("2", "2024-02-08T20:00:00.000Z", "La Deskomunal", ["jazz"]),
+    ];
+
+    render(<EventList events={events} />);
+    expect(screen.getAllByTestId("event-row")).toHaveLength(1);
+
+    openFilters();
+    fireEvent.change(screen.getByTestId("filter-date"), {
+      target: { value: "2024-02-08" },
+    });
+
+    expect(screen.getAllByTestId("event-row")).toHaveLength(1);
+    expect(screen.getByText("Event 2")).toBeInTheDocument();
+    expect(screen.queryByTestId("next-week-button")).not.toBeInTheDocument();
+    expect(screen.getByTestId("back-to-week")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("back-to-week"));
+
+    expect(screen.getAllByTestId("event-row")).toHaveLength(1);
+    expect(screen.getByTestId("next-week-button")).toBeInTheDocument();
+    expect(screen.queryByTestId("back-to-week")).not.toBeInTheDocument();
+  });
+
+  test("combines venue and tag filters and clears them all", () => {
+    const events = [
+      makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol", ["indie"]),
+      makeEvent("2", "2024-02-01T21:00:00.000Z", "Sala Vol", ["jazz"]),
+      makeEvent("3", "2024-02-01T22:00:00.000Z", "La Deskomunal", ["indie"]),
+    ];
+
+    render(<EventList events={events} />);
+    openFilters();
+    fireEvent.change(screen.getByTestId("filter-location"), {
+      target: { value: "vol" },
+    });
+    fireEvent.click(screen.getByTestId("filter-tag-indie"));
+
+    expect(screen.getAllByTestId("event-row")).toHaveLength(1);
+    expect(screen.getByTestId("filters-active-count")).toHaveTextContent("2");
+
+    fireEvent.click(screen.getByTestId("clear-filters"));
+
+    expect(screen.getAllByTestId("event-row")).toHaveLength(3);
+    expect(
+      screen.queryByTestId("filters-active-count"),
+    ).not.toBeInTheDocument();
+  });
+
+  test("shows a specific message when filters return no results", () => {
+    render(
+      <EventList
+        events={[makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol")]}
+      />,
+    );
+    openFilters();
+    fireEvent.change(screen.getByTestId("filter-location"), {
+      target: { value: "inexistent" },
+    });
+
+    expect(screen.getByTestId("filtered-noevents-message")).toHaveTextContent(
+      "No hi ha esdeveniments que coincideixin amb els filtres",
+    );
   });
 });
