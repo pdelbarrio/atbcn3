@@ -28,6 +28,7 @@ const makeEvent = (
 });
 
 const openFilters = () => fireEvent.click(screen.getByTestId("filters-toggle"));
+const applyFilters = () => fireEvent.click(screen.getByTestId("apply-filters"));
 
 describe("unit tests of the EventList component", () => {
   beforeEach(() => {
@@ -43,10 +44,10 @@ describe("unit tests of the EventList component", () => {
   test("renders only events for the current week", () => {
     // Arrange: 3 events from this simulated current week and 1 from other month.
     const events = [
-      { id: "1", date: "2024-02-01T00:00:00.000Z" },
-      { id: "2", date: "2024-02-01T00:00:00.000Z" },
-      { id: "3", date: "2024-02-01T00:00:00.000Z" },
-      { id: "4", date: "2024-03-01T00:00:00.000Z" },
+      makeEvent("1", "2024-02-01T00:00:00.000Z", "Sala Vol"),
+      makeEvent("2", "2024-02-01T00:00:00.000Z", "Sala Vol"),
+      makeEvent("3", "2024-02-01T00:00:00.000Z", "Sala Vol"),
+      makeEvent("4", "2024-03-01T00:00:00.000Z", "Sala Vol"),
     ];
     // Act: Render the component with the events.
     render(<EventList events={events} />);
@@ -58,15 +59,15 @@ describe("unit tests of the EventList component", () => {
 
   test("renders date separators for grouped events", () => {
     const events = [
-      { id: "1", date: "2024-02-01T10:00:00.000Z" },
-      { id: "2", date: "2024-02-01T15:00:00.000Z" },
-      { id: "3", date: "2024-02-02T10:00:00.000Z" },
+      makeEvent("1", "2024-02-01T10:00:00.000Z", "Sala Vol"),
+      makeEvent("2", "2024-02-01T15:00:00.000Z", "Sala Vol"),
+      makeEvent("3", "2024-02-02T10:00:00.000Z", "Sala Vol"),
     ];
 
     render(<EventList events={events} />);
 
-    const firstDateLabel = formattedDate("2024-02-01T00:00:00.000Z", "eeee d");
-    const secondDateLabel = formattedDate("2024-02-02T00:00:00.000Z", "eeee d");
+    const firstDateLabel = formattedDate("2024-02-01T00:00:00", "eeee d");
+    const secondDateLabel = formattedDate("2024-02-02T00:00:00", "eeee d");
 
     expect(screen.getByText(firstDateLabel)).toBeInTheDocument();
     expect(screen.getByText(secondDateLabel)).toBeInTheDocument();
@@ -77,16 +78,16 @@ describe("unit tests of the EventList component", () => {
   test("navigates to the next and previous weeks", () => {
     // Arrange
     const events = [
-      { id: "1", date: "2024-01-28T00:00:00.000Z" }, // An event from the last week of January 2024
-      { id: "2", date: "2024-02-01T00:00:00.000Z" }, // An event from the first week of February 2024
-      { id: "3", date: "2024-02-08T00:00:00.000Z" }, // An event from the second week of February 2024
+      makeEvent("1", "2024-01-28T00:00:00.000Z", "Sala Vol"), // An event from the last week of January 2024
+      makeEvent("2", "2024-02-01T00:00:00.000Z", "Sala Vol"), // An event from the first week of February 2024
+      makeEvent("3", "2024-02-08T00:00:00.000Z", "Sala Vol"), // An event from the second week of February 2024
     ];
 
     render(<EventList events={events} />);
 
     // Assert: Check that only the events for the first week are initially rendered.
     let eventRows = screen.getAllByTestId("event-row");
-    expect(eventRows).toHaveLength(1); // Adjust this number based on the number of events for the first week.
+    expect(eventRows).toHaveLength(1);
 
     // Act: Click the next week button.
     const nextWeekButton = screen.getByTestId("next-week-button");
@@ -94,7 +95,7 @@ describe("unit tests of the EventList component", () => {
 
     // Assert: Check that only the events for the second week are now rendered.
     eventRows = screen.getAllByTestId("event-row");
-    expect(eventRows).toHaveLength(1); // Adjust this number based on the number of events for the second week.
+    expect(eventRows).toHaveLength(1);
 
     // Act: Click the previous week button.
     const previousWeekButton = screen.getByTestId("previous-week-button");
@@ -102,15 +103,15 @@ describe("unit tests of the EventList component", () => {
 
     // Assert: Check that only the events for the first week are rendered again.
     eventRows = screen.getAllByTestId("event-row");
-    expect(eventRows).toHaveLength(1); // Adjust this number based on the number of events for the first week.
+    expect(eventRows).toHaveLength(1);
   });
 
   test("renders events for the current week or a message if there are no events", () => {
     // Arrange: set of events for the current week.
     const events = [
-      { id: "1", date: "2024-02-01T00:00:00.000Z" },
-      { id: "2", date: "2024-02-01T00:00:00.000Z" },
-      { id: "3", date: "2024-02-01T00:00:00.000Z" },
+      makeEvent("1", "2024-02-01T00:00:00.000Z", "Sala Vol"),
+      makeEvent("2", "2024-02-01T00:00:00.000Z", "Sala Vol"),
+      makeEvent("3", "2024-02-01T00:00:00.000Z", "Sala Vol"),
     ];
 
     // Act: Render the component with the events.
@@ -133,7 +134,7 @@ describe("unit tests of the EventList component", () => {
     expect(message).toBeInTheDocument();
   });
 
-  test("keeps filters collapsed until the button is clicked", () => {
+  test("keeps the filter modal closed until the button is clicked", () => {
     render(<EventList events={[]} />);
 
     expect(screen.queryByTestId("filters-panel")).not.toBeInTheDocument();
@@ -143,10 +144,11 @@ describe("unit tests of the EventList component", () => {
     expect(screen.getByTestId("filters-panel")).toBeInTheDocument();
   });
 
-  test("filters by venue with partial and accent-insensitive matching", () => {
+  test("filters by venue across all weeks with accent-insensitive matching", () => {
     const events = [
       makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol"),
-      makeEvent("2", "2024-02-01T21:00:00.000Z", "La Deskomunal"),
+      makeEvent("2", "2024-02-15T20:00:00.000Z", "Sala Vol"),
+      makeEvent("3", "2024-02-01T21:00:00.000Z", "La Deskomunal"),
     ];
 
     render(<EventList events={events} />);
@@ -154,75 +156,75 @@ describe("unit tests of the EventList component", () => {
     fireEvent.change(screen.getByTestId("filter-location"), {
       target: { value: "vol" },
     });
+    applyFilters();
 
-    expect(screen.getAllByTestId("event-row")).toHaveLength(1);
+    expect(screen.getAllByTestId("event-row")).toHaveLength(2);
     expect(screen.getByText("Event 1")).toBeInTheDocument();
+    expect(screen.getByText("Event 2")).toBeInTheDocument();
+    expect(screen.queryByTestId("next-week-button")).not.toBeInTheDocument();
   });
 
-  test("filters by tag with several tags selected and unifies case variants", () => {
+  test("filters by tag across all weeks and unifies case variants", () => {
     const events = [
       makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol", ["indie"]),
-      makeEvent("2", "2024-02-01T21:00:00.000Z", "La Deskomunal", ["INDIE"]),
-      makeEvent("3", "2024-02-01T22:00:00.000Z", "Sala Vol", ["jazz"]),
+      makeEvent("2", "2024-02-15T21:00:00.000Z", "La Deskomunal", ["INDIE"]),
+      makeEvent("3", "2024-03-01T22:00:00.000Z", "Sala Vol", ["jazz"]),
     ];
 
     render(<EventList events={events} />);
     openFilters();
     fireEvent.click(screen.getByTestId("filter-tag-indie"));
-
-    expect(screen.getAllByTestId("event-row")).toHaveLength(2);
-
     fireEvent.click(screen.getByTestId("filter-tag-jazz"));
+    applyFilters();
 
     expect(screen.getAllByTestId("event-row")).toHaveLength(3);
+    expect(screen.getByTestId("filters-active-count")).toHaveTextContent("1");
   });
 
-  test("jumps to a single day and returns to the week view", () => {
+  test("combines a day and a venue from different weeks", () => {
     const events = [
-      makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol", ["indie"]),
-      makeEvent("2", "2024-02-08T20:00:00.000Z", "La Deskomunal", ["jazz"]),
+      makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol"),
+      makeEvent("2", "2024-02-08T20:00:00.000Z", "Sala Vol"),
+      makeEvent("3", "2024-02-08T21:00:00.000Z", "La Deskomunal"),
     ];
 
     render(<EventList events={events} />);
-    expect(screen.getAllByTestId("event-row")).toHaveLength(1);
-
     openFilters();
     fireEvent.change(screen.getByTestId("filter-date"), {
       target: { value: "2024-02-08" },
     });
+    fireEvent.change(screen.getByTestId("filter-location"), {
+      target: { value: "vol" },
+    });
+    applyFilters();
 
     expect(screen.getAllByTestId("event-row")).toHaveLength(1);
     expect(screen.getByText("Event 2")).toBeInTheDocument();
-    expect(screen.queryByTestId("next-week-button")).not.toBeInTheDocument();
-    expect(screen.getByTestId("back-to-week")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByTestId("back-to-week"));
-
-    expect(screen.getAllByTestId("event-row")).toHaveLength(1);
-    expect(screen.getByTestId("next-week-button")).toBeInTheDocument();
-    expect(screen.queryByTestId("back-to-week")).not.toBeInTheDocument();
+    expect(screen.getByTestId("filters-active-count")).toHaveTextContent("2");
   });
 
-  test("combines venue and tag filters and clears them all", () => {
+  test("clears the filters and returns to the week shown before applying them", () => {
     const events = [
-      makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol", ["indie"]),
-      makeEvent("2", "2024-02-01T21:00:00.000Z", "Sala Vol", ["jazz"]),
-      makeEvent("3", "2024-02-01T22:00:00.000Z", "La Deskomunal", ["indie"]),
+      makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol"),
+      makeEvent("2", "2024-02-08T20:00:00.000Z", "La Deskomunal"),
+      makeEvent("3", "2024-02-15T20:00:00.000Z", "Sala Vol"),
     ];
 
     render(<EventList events={events} />);
+    fireEvent.click(screen.getByTestId("next-week-button"));
     openFilters();
     fireEvent.change(screen.getByTestId("filter-location"), {
       target: { value: "vol" },
     });
-    fireEvent.click(screen.getByTestId("filter-tag-indie"));
+    applyFilters();
+
+    expect(screen.getAllByTestId("event-row")).toHaveLength(2);
+
+    fireEvent.click(screen.getByTestId("clear-filters-results"));
 
     expect(screen.getAllByTestId("event-row")).toHaveLength(1);
-    expect(screen.getByTestId("filters-active-count")).toHaveTextContent("2");
-
-    fireEvent.click(screen.getByTestId("clear-filters"));
-
-    expect(screen.getAllByTestId("event-row")).toHaveLength(3);
+    expect(screen.getByText("Event 2")).toBeInTheDocument();
+    expect(screen.getByTestId("next-week-button")).toBeInTheDocument();
     expect(
       screen.queryByTestId("filters-active-count"),
     ).not.toBeInTheDocument();
@@ -238,9 +240,34 @@ describe("unit tests of the EventList component", () => {
     fireEvent.change(screen.getByTestId("filter-location"), {
       target: { value: "inexistent" },
     });
+    applyFilters();
 
     expect(screen.getByTestId("filtered-noevents-message")).toHaveTextContent(
       "No hi ha esdeveniments que coincideixin amb els filtres",
     );
+  });
+
+  test("shows an error message when events could not be loaded", () => {
+    render(<EventList events={null} />);
+
+    expect(screen.getByTestId("noevents-message")).toHaveTextContent(
+      "No s'han pogut carregar els esdeveniments",
+    );
+  });
+
+  test("does not crash when an event has no venue", () => {
+    const eventWithoutVenue = {
+      ...makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol"),
+      location: null as unknown as string,
+    };
+
+    render(<EventList events={[eventWithoutVenue]} />);
+    openFilters();
+    fireEvent.change(screen.getByTestId("filter-location"), {
+      target: { value: "vol" },
+    });
+    applyFilters();
+
+    expect(screen.getByTestId("filtered-noevents-message")).toBeInTheDocument();
   });
 });

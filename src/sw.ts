@@ -1,7 +1,7 @@
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { Serwist } from "serwist";
-import { NetworkFirst, StaleWhileRevalidate, CacheFirst } from "serwist";
+import { NetworkFirst, StaleWhileRevalidate, ExpirationPlugin } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -27,14 +27,20 @@ const serwist = new Serwist({
         networkTimeoutSeconds: 3,
       }),
     },
-    // Static assets - Cache first for performance
+    // Static assets - Revalidate in the background to avoid serving stale chunks
     {
-      matcher: ({ request }) => 
-        request.destination === 'style' || 
-        request.destination === 'script' || 
+      matcher: ({ request }) =>
+        request.destination === 'style' ||
+        request.destination === 'script' ||
         request.destination === 'font',
-      handler: new CacheFirst({
-        cacheName: 'static-assets',
+      handler: new StaleWhileRevalidate({
+        cacheName: 'static-assets-v2',
+        plugins: [
+          new ExpirationPlugin({
+            maxEntries: 64,
+            maxAgeSeconds: 60 * 60 * 24 * 7,
+          }),
+        ],
       }),
     },
     // Images - Stale while revalidate for balance of performance and freshness

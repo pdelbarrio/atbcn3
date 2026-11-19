@@ -101,7 +101,7 @@ Mejora de la experiencia de navegación de eventos semanal: los eventos ahora se
 
 ## atbcn 2.7 Filtros globales y estabilidad PWA (Noviembre 2026)
 
-Se añade un panel de filtros accesible desde un botón que permite filtrar **toda la agenda** por día, sala y estilos. Al aplicarlos, la navegación semanal se sustituye por una lista agrupada por día con la fecha completa y un contador de resultados; al pulsar `Neteja` o `Treu filtres` se limpian y se recupera la vista semanal habitual.
+Se añade un botón `Filtres` en la cabecera que abre un modal con filtros por día, sala y estilos. Los filtros se preparan en el modal y se aplican con `Aplica`: entonces se muestran todos los eventos futuros que coinciden, agrupados por día, sin importar la semana en que estuvieras. Se pueden combinar día + sala + estilos (los estilos suman). `Treu filtres` limpia la búsqueda y vuelve a la semana anterior; mientras hay filtros activos la navegación semanal queda oculta.
 
 También se corrige el registro del service worker en desarrollo para evitar que una caché obsoleta sirva chunks antiguos y provoque el error `ChunkLoadError: Loading chunk app/layout failed.` en Chrome. Los recursos estáticos pasan a una estrategia stale-while-revalidate con expiración.
 

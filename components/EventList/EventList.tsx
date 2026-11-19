@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { startOfWeek, endOfWeek, addWeeks, subWeeks, format } from "date-fns";
 import { formattedDate } from "@/lib/utils";
 import { LeftArrow, RightArrow } from "../Buttons";
@@ -11,36 +11,40 @@ import {
 import { TbSlashes } from "react-icons/tb";
 import { EventType } from "@/lib/types";
 import EventRow from "../EventRow/EventRow";
-import FilterPanel from "./FilterPanel";
+import FilterPanel, { FilterState } from "./FilterPanel";
 
 interface Props {
-  events: EventType[];
+  events: EventType[] | null;
 }
+
+const EMPTY_FILTERS: FilterState = { date: "", location: "", tags: [] };
 
 const normalize = (value: string) =>
   value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase();
 
-export default function EventList({ events }: any) {
+const toDayKey = (value: string | Date) => format(new Date(value), "yyyy-MM-dd");
+
+export default function EventList({ events }: Props) {
+  const safeEvents = useMemo(() => events ?? [], [events]);
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
+  const weekBeforeFilters = useRef(new Date());
 
   const currentWeekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const currentWeekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 });
 
   const locationOptions = useMemo<string[]>(() => {
-    const locations: string[] = events
-      .map((event: EventType) => event.location)
-      .filter((location: string) => Boolean(location));
-    return Array.from(new Set<string>(locations)).sort((a, b) =>
+    const locations = safeEvents
+      .map((event) => event.location)
+      .filter((location): location is string => Boolean(location));
+    return Array.from(new Set(locations)).sort((a, b) =>
       a.localeCompare(b, "ca"),
     );
-  }, [events]);
+  }, [safeEvents]);
 
   const tagOptions = useMemo(() => {
     const uniqueTags = new Map<string, string>();
-    events.forEach((event: EventType) => {
+    safeEvents.forEach((event) => {
       (event.tags ?? []).forEach((tag) => {
         const key = normalize(tag);
         if (key && !uniqueTags.has(key)) uniqueTags.set(key, tag);
@@ -49,38 +53,40 @@ export default function EventList({ events }: any) {
     return Array.from(uniqueTags.values()).sort((a, b) =>
       a.localeCompare(b, "ca"),
     );
-  }, [events]);
+  }, [safeEvents]);
 
   const activeFilterCount =
-    (selectedDate ? 1 : 0) +
-    (locationFilter.trim() ? 1 : 0) +
-    (selectedTags.length > 0 ? 1 : 0);
+    (filters.date ? 1 : 0) +
+    (filters.location.trim() ? 1 : 0) +
+    (filters.tags.length > 0 ? 1 : 0);
+  const isFiltering = activeFilterCount > 0;
 
-  const eventsInView = events.filter((event: EventType) => {
-    const eventDate = new Date(event.date);
+  const eventsInView = safeEvents.filter((event) => {
+    if (isFiltering) {
+      if (filters.date && toDayKey(event.date) !== filters.date) return false;
 
-    if (selectedDate) {
-      if (format(eventDate, "yyyy-MM-dd") !== selectedDate) return false;
-    } else if (eventDate < currentWeekStart || eventDate > currentWeekEnd) {
-      return false;
-    }
-
-    const locationTerm = locationFilter.trim();
-    if (
-      locationTerm &&
-      !normalize(event.location).includes(normalize(locationTerm))
-    ) {
-      return false;
-    }
-
-    if (selectedTags.length > 0) {
-      const eventTagKeys = (event.tags ?? []).map(normalize);
-      if (!selectedTags.some((tag) => eventTagKeys.includes(normalize(tag)))) {
+      const locationTerm = filters.location.trim();
+      if (
+        locationTerm &&
+        !normalize(event.location ?? "").includes(normalize(locationTerm))
+      ) {
         return false;
       }
+
+      if (filters.tags.length > 0) {
+        const eventTagKeys = (event.tags ?? []).map(normalize);
+        if (
+          !filters.tags.some((tag) => eventTagKeys.includes(normalize(tag)))
+        ) {
+          return false;
+        }
+      }
+
+      return true;
     }
 
-    return true;
+    const eventDate = new Date(event.date);
+    return eventDate >= currentWeekStart && eventDate <= currentWeekEnd;
   });
 
   const eventsSorted = [...eventsInView].sort(
@@ -89,7 +95,7 @@ export default function EventList({ events }: any) {
 
   const groupedEvents = eventsSorted.reduce(
     (groups: Record<string, EventType[]>, event) => {
-      const dayKey = format(new Date(event.date), "yyyy-MM-dd");
+      const dayKey = toDayKey(event.date);
       if (!groups[dayKey]) {
         groups[dayKey] = [];
       }
@@ -113,60 +119,68 @@ export default function EventList({ events }: any) {
     setCurrentWeek(subWeeks(currentWeek, 1));
   };
 
-  const backToWeek = () => {
-    if (selectedDate) {
-      setCurrentWeek(new Date(`${selectedDate}T00:00:00`));
-    }
-    setSelectedDate("");
-  };
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags((current) =>
-      current.includes(tag)
-        ? current.filter((item) => item !== tag)
-        : [...current, tag],
-    );
+  const applyFilters = (next: FilterState) => {
+    if (!isFiltering) weekBeforeFilters.current = currentWeek;
+    setFilters(next);
   };
 
   const clearFilters = () => {
-    setSelectedDate("");
-    setLocationFilter("");
-    setSelectedTags([]);
+    setFilters(EMPTY_FILTERS);
+    setCurrentWeek(weekBeforeFilters.current);
   };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [currentWeek, selectedDate, locationFilter, selectedTags]);
+  }, [currentWeek, filters]);
 
-  const emptyMessage = selectedDate
-    ? "No hi ha esdeveniments per a aquest dia"
-    : activeFilterCount > 0
+  const emptyMessage = !events
+    ? "No s'han pogut carregar els esdeveniments"
+    : isFiltering
       ? "No hi ha esdeveniments que coincideixin amb els filtres"
       : "No hi ha esdeveniments introduïts per a aquesta setmana";
 
+  const filterSummary = [
+    filters.date ? formattedDate(`${filters.date}T00:00:00`, "d MMM") : "",
+    filters.location.trim(),
+    ...filters.tags,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const filterPanel = (
+    <FilterPanel
+      filters={filters}
+      locations={locationOptions}
+      tags={tagOptions}
+      activeCount={activeFilterCount}
+      onApply={applyFilters}
+    />
+  );
+
   return (
     <>
-      <div className="px-4 justify-between flex items-center bg-card dark:bg-gradient-dark dark:border dark:border-glow rounded-lg shadow-lg overflow-hidden mb-3 text-center py-2">
-        {selectedDate ? (
+      <div className="px-4 justify-between flex items-center gap-2 bg-card dark:bg-gradient-dark dark:border dark:border-glow rounded-lg shadow-lg overflow-hidden mb-3 text-center py-2">
+        {isFiltering ? (
           <>
+            <div className="min-w-0">
+              <p className="text-text text-xs md:text-base dark:text-glow font-bold">
+                Resultats
+              </p>
+              <p className="max-w-[45vw] truncate text-xs opacity-70">
+                {filterSummary}
+              </p>
+            </div>
             <button
               type="button"
-              data-testid="back-to-week"
-              onClick={backToWeek}
-              className="flex items-center hover:cursor-pointer p-1 mr-2 text-text dark:text-glow"
+              data-testid="clear-filters-results"
+              onClick={clearFilters}
+              className="whitespace-nowrap text-xs font-bold uppercase tracking-wide text-text dark:text-glow hover:opacity-70"
             >
-              <IoIosArrowDropleftCircle className="w-7 h-7 text-btvgray dark:text-glow" />
-              <span className="text-xs font-bold">Setmana</span>
+              Treu filtres
             </button>
-            <p className="text-text text-xs md:text-base dark:text-glow font-bold">
-              {formattedDate(
-                `${selectedDate}T00:00:00.000Z`,
-                "eeee d 'de' MMMM",
-              )}
-            </p>
-            <div className="w-20" />
+            {filterPanel}
           </>
         ) : (
           <>
@@ -186,25 +200,15 @@ export default function EventList({ events }: any) {
               del {formattedDate(currentWeekStart.toISOString(), "d MMMM")} al{" "}
               {formattedDate(currentWeekEnd.toISOString(), "d MMMM, yyyy")}
             </p>
-            <div onClick={nextWeek} className="hover:cursor-pointer p-1">
-              <IoIosArrowDroprightCircle className="w-8 h-8 text-btvgray dark:text-glow" />
+            <div className="flex items-center gap-2">
+              {filterPanel}
+              <div onClick={nextWeek} className="hover:cursor-pointer p-1">
+                <IoIosArrowDroprightCircle className="w-8 h-8 text-btvgray dark:text-glow" />
+              </div>
             </div>
           </>
         )}
       </div>
-
-      <FilterPanel
-        selectedDate={selectedDate}
-        onSelectedDateChange={setSelectedDate}
-        location={locationFilter}
-        onLocationChange={setLocationFilter}
-        locations={locationOptions}
-        selectedTags={selectedTags}
-        onToggleTag={toggleTag}
-        tags={tagOptions}
-        onClear={clearFilters}
-        activeCount={activeFilterCount}
-      />
 
       <div>
         {eventsInView.length > 0 ? (
@@ -214,16 +218,12 @@ export default function EventList({ events }: any) {
                 <div className="mb-2">
                   <div className="flex items-center text-left text-sm md:text-base font-bold text-text dark:text-glow uppercase tracking-wide">
                     <TbSlashes />
-                    {formattedDate(`${dayKey}T00:00:00.000Z`, "eeee d")}
+                    {formattedDate(`${dayKey}T00:00:00`, "eeee d")}
                   </div>
                 </div>
                 <div className="space-y-3">
                   {groupEvents.map((event: EventType) => (
-                    <EventRow
-                      data-testid="event-row"
-                      event={event}
-                      key={event.id}
-                    />
+                    <EventRow event={event} key={event.id} />
                   ))}
                 </div>
               </div>
@@ -236,7 +236,7 @@ export default function EventList({ events }: any) {
           >
             <p
               data-testid={
-                activeFilterCount > 0 ? "filtered-noevents-message" : undefined
+                isFiltering ? "filtered-noevents-message" : undefined
               }
               className="text-center p-10 text-text dark:text-glow font-bold"
             >
@@ -246,7 +246,7 @@ export default function EventList({ events }: any) {
         )}
       </div>
 
-      {!selectedDate && (
+      {!isFiltering && (
         <div className="max-w-screen-sm mx-auto px-4 pb-20">
           <div className="flex justify-between py-4">
             <div>

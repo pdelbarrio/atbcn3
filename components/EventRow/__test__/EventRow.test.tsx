@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { format } from "date-fns";
 import EventRow from "../EventRow";
 import { formattedDate } from "@/lib/utils";
 
@@ -38,18 +39,15 @@ describe("unit tests of the EventRow component", () => {
       created_by: "mailofthecreator@gmail.com",
       created_at: "2024-01-02T00:00:00.000Z",
     };
-    // Calculate the formatted date string.
-    const formattedDateStr = formattedDate(
-      event.date,
-      "eee, dd/MM/yyyy HH:mm'h'",
-    );
     //Act: Render the component with the event
     render(<EventRow event={event} />);
 
     //Assert: check that the event information is rendered
     expect(screen.getByText(event.name)).toBeInTheDocument();
     expect(screen.getByText(event.location)).toBeInTheDocument();
-    expect(screen.getByText(formattedDateStr)).toBeInTheDocument();
+    expect(
+      screen.getByText(format(new Date(event.date), "HH:mm")),
+    ).toBeInTheDocument();
     expect(screen.getByText(event.price)).toBeInTheDocument();
     event.tags.forEach((tag) => {
       expect(screen.getByText(tag)).toBeInTheDocument();

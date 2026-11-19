@@ -2,39 +2,51 @@
 
 import { useEffect, useState } from 'react';
 import '@khmyznikov/pwa-install';
+import { shouldRegisterServiceWorker } from '@/lib/pwa-registration';
 
 export default function PWA() {
-  const [swStatus, setSwStatus] = useState<'loading' | 'registered' | 'failed'>('loading');
+  const [swStatus, setSwStatus] = useState<'loading' | 'registered' | 'failed' | 'skipped'>('loading');
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
-        setSwStatus('loading');
-        navigator.serviceWorker.register('/sw.js').then(
-          function (registration) {
-            console.log('Service Worker registration successful with scope: ', registration.scope);
-            setSwStatus('registered');
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
-            // Add update checking
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              newWorker?.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New content is available, show a notification if you want
-                  if (confirm('Nova versió disponible. Actualitzar ara?')) {
-                    window.location.reload();
-                  }
-                }
-              });
-            });
-          },
-          function (err) {
-            console.log('Service Worker registration failed: ', err);
-            setSwStatus('failed');
-          }
-        );
-      }
+    const shouldRegister = shouldRegisterServiceWorker();
+
+    if (!shouldRegister) {
+      navigator.serviceWorker.getRegistrations().then(
+        (registrations) => {
+          registrations.forEach((registration) => void registration.unregister());
+        },
+        (err) => {
+          console.log('Service Worker cleanup failed: ', err);
+        }
+      );
+      setSwStatus('skipped');
+      return;
     }
+
+    setSwStatus('loading');
+    navigator.serviceWorker.register('/sw.js').then(
+      function (registration) {
+        console.log('Service Worker registration successful with scope: ', registration.scope);
+        setSwStatus('registered');
+
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker?.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              if (confirm('Nova versió disponible. Actualitzar ara?')) {
+                window.location.reload();
+              }
+            }
+          });
+        });
+      },
+      function (err) {
+        console.log('Service Worker registration failed: ', err);
+        setSwStatus('failed');
+      }
+    );
   }, []);
 
   return (

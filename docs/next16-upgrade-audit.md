@@ -90,7 +90,7 @@ Las versiones objetivo son orientativas; confirmar con `npm view <paquete> peerD
 ## Contingencia y rollback
 
 - Cada fase termina en un commit: revert local con `git revert <sha>` o vuelta al tag `backup/pre-next16`.
-- **Nunca migrar desde `feat/filters`**; los filtros se cherry-pickean o mergean después si procede.
+- Los filtros de `feat/filters` ya están integrados en la rama de trabajo; la migración debe arrancar de una `main` que los incluya, nunca de una rama de filtros aislada.
 - En Vercel: *Instant Rollback* al deployment anterior; es más rápido que revertir y redeployar.
 - Restaurar también el `public/sw.js` anterior: los clientes con el SW nuevo pueden seguir sirviendo chunks cacheados y necesitar limpiar datos del sitio (caso ya visto en Chrome con `ChunkLoadError`).
 - Criterios de aborto: build rojo tras dos intentos, tests nuevos fallidos, fallo en login/alta de evento/PWA o errores sostenidos en el preview deployment.
@@ -99,7 +99,7 @@ Las versiones objetivo son orientativas; confirmar con `npm view <paquete> peerD
 ## Checklist de QA manual
 
 - Home sin loader bloqueado; navegación semanal y scroll al cambiar de semana.
-- Filtros globales por día, sala y estilos; `Aplica`, `Neteja` y `Treu filtres`.
+- Filtros globales por día, sala y estilos desde el modal `Filtres`: `Aplica` muestra resultados de todas las semanas futuras y `Treu filtres` vuelve a la semana anterior.
 - Modal de detalle, copiar evento y enlace de calendario.
 - Login (email y Gmail) y alta de evento en 4 pasos con autocompletado de sala.
 - Panel de moderación y endpoint de limpieza de eventos.
@@ -108,4 +108,4 @@ Las versiones objetivo son orientativas; confirmar con `npm view <paquete> peerD
 
 ## Estado actual
 
-Documentación de apoyo para la versión `2.7`. La migración a Next 16 **no se ha ejecutado**; cuando se aborde, se seguirá este documento y se actualizará con los resultados reales.
+Documentación de apoyo para la versión `2.7`, con filtros y arreglo del service worker ya integrados en la rama de trabajo. La migración a Next 16 **no se ha ejecutado**; cuando se aborde, se seguirá este documento y se actualizará con los resultados reales.

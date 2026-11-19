@@ -13,7 +13,7 @@ The service worker is the core of the PWA functionality, handling:
 - **Precaching**: Automatically caches critical assets during installation
 - **Runtime caching**: Uses different strategies for different resource types:
   - Network-first for HTML pages and API requests
-  - Cache-first for static assets (CSS, JS, fonts)
+  - Stale-while-revalidate for static assets (CSS, JS, fonts)
   - Stale-while-revalidate for images
 - **Offline fallback**: Redirects to `/offline` page when network requests fail
 - **Update management**: Handles service worker updates with skipWaiting and clientsClaim
@@ -22,7 +22,8 @@ The service worker is the core of the PWA functionality, handling:
 
 Client-side component that:
 
-- Registers the service worker
+- Registers the service worker only in production (`NODE_ENV === 'production'`, via `lib/pwa-registration.ts`), matching the `disable` flag in `next.config.js`
+- Removes any previous registration when running outside production, so a stale development build cannot serve cached chunks
 - Provides installation prompt using `@khmyznikov/pwa-install`
 - Handles service worker status and updates
 
@@ -49,10 +50,10 @@ Custom type definitions in `types/pwa-install.d.ts` for the web component.
    - Falls back to cache if network fails
    - Best for frequently updated content
 
-2. **Cache First** (for static assets)
-   - Serves from cache immediately if available
-   - Updates cache in background
-   - Best for rarely changing assets
+2. **Stale While Revalidate with expiration** (for static assets)
+   - Serves from cache immediately
+   - Revalidates in the background and expires entries after 7 days
+   - Avoids serving stale JS chunks after a deploy
 
 3. **Stale While Revalidate** (for images)
    - Serves from cache immediately
@@ -72,7 +73,8 @@ The PWA implementation includes a mechanism to notify users when a new version i
 
 ## Troubleshooting
 
-- **Service Worker not registering**: Check console for errors, ensure HTTPS or localhost
+- **Service Worker not registering**: Check console for errors and confirm the build is production. In development the worker is intentionally not registered and any previous registration is removed.
+- **Stale chunks after a deploy**: static assets now use stale-while-revalidate with expiration; hard-refresh or clear site data if an old chunk still loads
 - **Assets not caching**: Verify cache configuration in service worker
 - **Updates not detected**: Check update event listeners
 
