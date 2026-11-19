@@ -29,17 +29,14 @@ export default function EventList({ events }: any) {
   const currentWeekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const currentWeekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 });
 
-  const locationOptions = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          events
-            .map((event: EventType) => event.location)
-            .filter((location: string) => Boolean(location)),
-        ),
-      ).sort((a, b) => a.localeCompare(b, "ca")),
-    [events],
-  );
+  const locationOptions = useMemo<string[]>(() => {
+    const locations: string[] = events
+      .map((event: EventType) => event.location)
+      .filter((location: string) => Boolean(location));
+    return Array.from(new Set<string>(locations)).sort((a, b) =>
+      a.localeCompare(b, "ca"),
+    );
+  }, [events]);
 
   const tagOptions = useMemo(() => {
     const uniqueTags = new Map<string, string>();
