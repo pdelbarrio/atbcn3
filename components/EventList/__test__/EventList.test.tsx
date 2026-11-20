@@ -164,6 +164,26 @@ describe("unit tests of the EventList component", () => {
     expect(screen.queryByTestId("next-week-button")).not.toBeInTheDocument();
   });
 
+  test("includes the month in date separators and reserves footer space when filtering", () => {
+    const events = [makeEvent("1", "2024-03-01T20:00:00.000Z", "Sala Vol")];
+    const filteredDateLabel = formattedDate(
+      "2024-03-01T00:00:00",
+      "eeee d 'de' MMMM",
+    );
+
+    render(<EventList events={events} />);
+    expect(screen.queryByText(filteredDateLabel)).not.toBeInTheDocument();
+
+    openFilters();
+    fireEvent.change(screen.getByTestId("filter-location"), {
+      target: { value: "vol" },
+    });
+    applyFilters();
+
+    expect(screen.getByText(filteredDateLabel)).toBeInTheDocument();
+    expect(screen.getByTestId("filtered-events")).toHaveClass("pb-20");
+  });
+
   test("filters by tag across all weeks and unifies case variants", () => {
     const events = [
       makeEvent("1", "2024-02-01T20:00:00.000Z", "Sala Vol", ["indie"]),

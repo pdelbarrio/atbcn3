@@ -210,7 +210,10 @@ export default function EventList({ events }: Props) {
         )}
       </div>
 
-      <div>
+      <div
+        data-testid={isFiltering ? "filtered-events" : undefined}
+        className={isFiltering ? "pb-20" : undefined}
+      >
         {eventsInView.length > 0 ? (
           <div suppressHydrationWarning>
             {groupedEventEntries.map(([dayKey, groupEvents]) => (
@@ -218,7 +221,10 @@ export default function EventList({ events }: Props) {
                 <div className="mb-2">
                   <div className="flex items-center text-left text-sm md:text-base font-bold text-text dark:text-glow uppercase tracking-wide">
                     <TbSlashes />
-                    {formattedDate(`${dayKey}T00:00:00`, "eeee d")}
+                    {formattedDate(
+                      `${dayKey}T00:00:00`,
+                      isFiltering ? "eeee d 'de' MMMM" : "eeee d",
+                    )}
                   </div>
                 </div>
                 <div className="space-y-3">
