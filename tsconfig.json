@@ -1,8 +1,15 @@
 {
   "compilerOptions": {
     "target": "es2015",
-    "types": ["@types/jest"],
-    "lib": ["dom", "dom.iterable", "esnext", "webworker"],
+    "types": [
+      "@types/jest"
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "webworker"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -12,7 +19,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -20,7 +27,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*", "./src/*"]
+      "@/*": [
+        "./*",
+        "./src/*"
+      ]
     }
   },
   "include": [
@@ -29,7 +39,14 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "lib/CloudinaryUploadWidget.js",
-    "types/**/*.d.ts"
+    "types/**/*.d.ts",
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "**/__tests__/**/*", "**/__test__/**/*"]
+    "exclude": [
+      "node_modules",
+      "cypress",
+      "cypress.config.ts",
+      "**/__tests__/**/*",
+      "**/__test__/**/*"
+    ]
 }
