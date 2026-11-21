@@ -1,3 +1,5 @@
+'use client';
+
 import { FaWifi } from 'react-icons/fa';
 
 export default function Offline() {

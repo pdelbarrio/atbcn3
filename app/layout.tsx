@@ -9,10 +9,8 @@ import { GlobalContextProvider } from "@/context/events.context";
 import { AuthContextProvider } from "@/context/auth.context";
 import { Toaster } from "@/components/ui/toaster";
 import { Footer } from "@/components/Footer";
-import dynamic from "next/dynamic";
+import PWA from "./pwa";
 import { Analytics } from "@vercel/analytics/react";
-
-const PWA = dynamic(() => import("./pwa"), { ssr: false });
 
 const nunito = Nunito({
   weight: ["200", "400", "600", "700", "800"],

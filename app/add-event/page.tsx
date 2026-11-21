@@ -613,7 +613,7 @@ export default function AddEvent() {
                     minDate={new Date()}
                     showTimeSelect
                     selected={date}
-                    onChange={(date) => setDate(date)}
+                    onChange={(date: Date | null) => setDate(date)}
                     timeFormat="HH:mm"
                     timeIntervals={15}
                     dateFormat="dd/MM/yy HH:mm"

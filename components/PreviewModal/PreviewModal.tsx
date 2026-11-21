@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import Tag from "../Tag";
 import { MdLocationOn } from "react-icons/md";
 import { GoClockFill } from "react-icons/go";
@@ -13,7 +13,7 @@ import { formattedDate } from "@/lib/utils";
 import Image from "next/image";
 import { useToast } from "../ui/use-toast";
 
-const dropIn = {
+const dropIn: Variants = {
   hidden: {
     y: "-100vh",
     opacity: 0,
