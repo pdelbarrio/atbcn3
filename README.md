@@ -29,13 +29,16 @@ La aplicación para estar al día de los eventos locales.
 - **Protección contra mal uso:** Se ha implementado un sistema de baneo de usuarios para prevenir eventos inapropiados o engañosos. Cada evento se vincula al usuario responsable, lo que permite tomar medidas rápidas y eficaces.
 
 - **Privacidad y seguridad:** @bcn utiliza Supabase como backend, garantizando la protección de tus datos y eliminando la necesidad de configurar tu propio servidor.
--
+
+- **Filtros:** Filtros de eventos por día, sala y estilo/s.
 
 ## Motivación del proyecto
 
 Con @bcn, he creado una herramienta práctica y eficiente para mantener a las personas informadas sobre los eventos locales, solventando el problema de tener toda la información dispersa en diferentes aplicaciones y sitios web. Además de ser una aplicación muy útil, este proyecto demuestra mi capacidad para moverme con documentación y aprender nuevas tecnologías experimentales, como la app folder de las versiones de Next.js posteriores a 13.2, los React Server Components y la integración con Supabase.
 
 Este proyecto también destaca mi habilidad para crear una interfaz de usuario intuitiva y receptiva, así como nuestro enfoque en la calidad y la seguridad de los datos. @bcn es más que una simple agenda de eventos; es un testimonio de mi experiencia en desarrollo web y mi capacidad para entregar proyectos funcionales y orientados al usuario.
+
+En el desarrollo he incorporado la IA de forma progresiva como acelerador, usando OpenCode para tareas de implementación, refactorización y exploración técnica. La utilizo con criterio de ingeniería: mantengo testing, revisión de código, tipado, linting y buenas prácticas propias de proyectos empresariales, validando siempre las sugerencias antes de integrarlas. Esto me permite aumentar la productividad sin sacrificar calidad, seguridad ni mantenibilidad.
 
 ## PWA Functionality
 
@@ -104,6 +107,10 @@ Mejora de la experiencia de navegación de eventos semanal: los eventos ahora se
 Se añade un botón `Filtres` en la cabecera que abre un modal con filtros por día, sala y estilos. Los filtros se preparan en el modal y se aplican con `Aplica`: entonces se muestran todos los eventos futuros que coinciden, agrupados por día, sin importar la semana en que estuvieras. Se pueden combinar día + sala + estilos (los estilos suman). `Treu filtres` limpia la búsqueda y vuelve a la semana anterior; mientras hay filtros activos la navegación semanal queda oculta.
 
 También se corrige el registro del service worker en desarrollo para evitar que una caché obsoleta sirva chunks antiguos y provoque el error `ChunkLoadError: Loading chunk app/layout failed.` en Chrome. Los recursos estáticos pasan a una estrategia stale-while-revalidate con expiración.
+
+## atbcn 2.8 Actualización de dependencias (Noviembre 2026)
+
+Actualización prioritaria de versiones (a Next.js 16 y React 19).
 
 ## Deuda técnica / migraciones
 
