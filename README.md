@@ -107,7 +107,7 @@ También se corrige el registro del service worker en desarrollo para evitar que
 
 ## Deuda técnica / migraciones
 
-- [Auditoría de migración a Next.js 16 y plan de contingencia](docs/next16-upgrade-audit.md). Decisión actual: mantener Serwist con webpack (`next build --webpack`) cuando se aborde la migración.
+- [Migración a Next.js 16](docs/next16-upgrade-audit.md) completada en noviembre de 2026: Serwist se mantiene con webpack (`next build --webpack`). El documento recoge las versiones reales y las decisiones tomadas.
 
 ## Créditos
 
@@ -144,6 +144,8 @@ Este proyecto se encuentra bajo la licencia [MIT](LICENSE).
 - [x] Improved UX for navigating events. Events now are grouped by day and when the week changes, the page automatically scrolls to the top.(2.6)
 - [x] Added global filters by day, venue and tags (2.7)
 - [x] Fixed stale service worker chunks in development (2.7)
+- [x] Migrated to Next.js 16 and React 19 (2.8)
+- [x] Upgraded runtime to Node.js 24 (2.8)
 
 ### Figma prototype
 
