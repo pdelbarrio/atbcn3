@@ -1,7 +1,7 @@
 # Auditoría de migración a Next.js 16 y plan de contingencia
 
 - **Fecha:** 2026-11-19
-- **Estado:** solo auditoría; **no ejecutada**
+- **Estado:** ejecutada el 2026-11-21 (Fase 1 con Node 22 y Fase 2 con Node 24); pendiente de QA manual y deploy
 - **Repo:** `atbcn2` (`C:\Users\misse\Desktop\atbcn_info\atbcn2`)
 - **Referencia:** `main` en `de490e6`; auditoría realizada sobre la rama local `feat/filters`
 
@@ -106,6 +106,55 @@ Las versiones objetivo son orientativas; confirmar con `npm view <paquete> peerD
 - PWA: instalación, offline, actualización y caché de chunks.
 - Tema oscuro y analítica.
 
-## Estado actual
+## Ejecución real (2026-11-21)
 
-Documentación de apoyo para la versión `2.7`, con filtros y arreglo del service worker ya integrados en la rama de trabajo. La migración a Next 16 **no se ha ejecutado**; cuando se aborde, se seguirá este documento y se actualizará con los resultados reales.
+Rama `chore/next16-upgrade`, desde `origin/main`. Dos commits: `chore(deps): upgrade to Next 16 and React 19` y `fix(next16): adapt code and proxy to Next 16 and React 19`.
+
+### Versiones finales instaladas
+
+| Paquete | Antes | Después |
+|---|---|---|
+| `next` | 14.2.35 | 16.4.6 |
+| `react`, `react-dom` | 18.3.1 | 19.3.1 |
+| `@types/react`, `@types/react-dom` | 18.3.x | 19.3.0 |
+| `@types/node` | 22.19.1 | 24.19.2 |
+| `engines.node` | 22.x | 24.x |
+| `next-cloudinary` | 5.18.0 | 7.1.1 |
+| `@supabase/ssr` | 0.0.10 | 0.12.7 |
+| `@supabase/supabase-js` | 2.86.2 | 2.119.2 |
+| `@serwist/next`, `@serwist/sw`, `@serwist/precaching` | 9.2.3 | 9.5.15 |
+| `@serwist/cli` | — (peer) | 9.5.15 (añadido) |
+| `framer-motion` | 10.18.0 | 12.43.0 |
+| `next-themes` | 0.2.1 | 0.4.6 |
+| `react-datepicker` | 4.25.0 | 9.1.0 |
+| `date-fns-tz` | — (peer) | 3.2.0 (añadido) |
+| `@testing-library/react` | 14.3.1 | 16.3.3 |
+| `@testing-library/dom` | — (peer) | 10.4.2 (añadido) |
+| `eslint` | 8.57.1 | 9.39.5 |
+| `eslint-config-next` | 14.0.4 | 16.4.6 |
+| `lucide-react` | 0.299.0 | 1.77.0 |
+| `react-spinners` | 0.13.8 | 0.17.1 |
+| `react-day-picker` | 8.10.0 | 10.0.2 |
+| `@hookform/resolvers`, `zod`, `date-fns` | sin cambios | 3.10.0 / 3.22.4 / 3.2.0 |
+
+`lucide-react`, `react-spinners` y `react-day-picker` no figuraban en la tabla de dependencias críticas de la auditoría, pero sus peers declaraban React 18 y bloqueaban la actualización del lockfile. Se han subido a versiones con peer React 19; no han requerido cambios de código (`react-day-picker` además no está en uso).
+
+### Cambios de configuración y código
+
+- Scripts: `dev` y `build` usan `--webpack` para conservar Serwist; `lint` pasa de `next lint` a `eslint .`.
+- ESLint: `.eslintrc.json` sustituido por `eslint.config.mjs` (flat config); se desactiva `react-hooks/set-state-in-effect` para no introducir errores nuevos sobre código existente.
+- `middleware.ts` → `proxy.ts`, usando cookies de la request; `runtime` no se declara porque el proxy de Next 16 siempre corre en Node.
+- `lib/supabase/index.ts`: `await cookies()` y API `getAll`/`setAll` de `@supabase/ssr` moderno.
+- `app/layout.tsx`: eliminado `ssr: false` (PWA ya es cliente); `app/offline.tsx`: añadido `'use client'`.
+- Ajustes de tipos por React 19: `Variants` en `PreviewModal`, imports de `next-themes`, declaración JSX de `pwa-install` y tipado del `onChange` de `react-datepicker`.
+- Cypress se eliminó de dependencias: su postinstall bloqueaba la instalación en Windows. Sus archivos quedan excluidos del typecheck y del lint.
+
+### Gates ejecutados
+
+- Fase 1 (Node 22.23.5): `npm run build` y `npm run dev` correctos.
+- Fase 2 (Node 24.19.0): `npx tsc --noEmit`, `npm run build` y `npm run lint` correctos (1 warning preexistente de `<img>`).
+- No se ejecutaron los codemods: los bloqueadores se detectaron con el build y se corrigieron manualmente.
+
+### Pendiente
+
+QA manual del checklist de arriba, preview deployment con las env vars, confirmar en Vercel que la Node.js Version del proyecto es 24.x y merge a `main`.
